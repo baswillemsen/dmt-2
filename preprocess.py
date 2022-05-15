@@ -15,5 +15,5 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 # Load the data
-data_file_path = "C:/Users/Bas/OneDrive/MSc. Artificial Intelligence VU/MSc. AI Year 1/Data Mining Techniques/Assignment 2/data/"
-train = pd.read_csv(data_file_path + "training_set_VU_DM.csv", sep=',')
+# data_file_path = "C:/Users/Bas/OneDrive/MSc. Artificial Intelligence VU/MSc. AI Year 1/Data Mining Techniques/Assignment 2/data/"
+train = pd.read_csv("data_subset/train_subset.csv", sep=',')
