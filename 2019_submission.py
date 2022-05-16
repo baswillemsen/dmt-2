@@ -417,23 +417,26 @@ def run(train_csv, test_csv, output_dir):
     training_data = load_data(train_csv)
     training_data, y = preprocess_training_data(training_data)
 
-    method = "dart"
-    validation_num = 150000
-    lr = 0.12
-    # for i in range(0, int(len(training_data.index) / validation_num)): # enable for cross-validation
-    for i in range(0, 1):
-        val_start = i * validation_num
-        val_end = (i + 1) * validation_num
-        x1, x2, y1, y2, groups, eval_groups, srch_id_dest_id_dict = split_train_data(
-            training_data, y, val_start, val_end
-        )
-        model = train_model(
-            x1, x2, y1, y2, groups, eval_groups, lr, method, output_dir, name_of_model
-        )
-        test_data = load_data(test_csv)
-        test_data, _ = preprocess_training_data(test_data, kind="test")
-        predict(name_of_model, test_data, srch_id_dest_id_dict, output_dir)
-        print("Submit the predictions file submission.csv to kaggle")
+    training_data.to_csv("data_subset/training_data.csv", index=False, header=True)
+    y.to_csv("data_subset/y.csv", index=False, header=True)
+
+    # method = "dart"
+    # validation_num = 150000
+    # lr = 0.12
+    # # for i in range(0, int(len(training_data.index) / validation_num)): # enable for cross-validation
+    # for i in range(0, 1):
+    #     val_start = i * validation_num
+    #     val_end = (i + 1) * validation_num
+    #     x1, x2, y1, y2, groups, eval_groups, srch_id_dest_id_dict = split_train_data(
+    #         training_data, y, val_start, val_end
+    #     )
+    #     model = train_model(
+    #         x1, x2, y1, y2, groups, eval_groups, lr, method, output_dir, name_of_model
+    #     )
+    #     test_data = load_data(test_csv)
+    #     test_data, _ = preprocess_training_data(test_data, kind="test")
+    #     predict(name_of_model, test_data, srch_id_dest_id_dict, output_dir)
+    #     print("Submit the predictions file submission.csv to kaggle")
 
 
 if __name__ == "__main__":
