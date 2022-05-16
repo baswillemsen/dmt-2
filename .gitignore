@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# large file folder
+data/
+
+# bas folder
 .idea
 
 # Distribution / packaging
