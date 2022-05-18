@@ -1,22 +1,18 @@
 # Install relevant packages
 import numpy as np
 import pandas as pd
-
 from sklearn.model_selection import GroupShuffleSplit
+
+from features import *
 from config import TRAINING_PATH, TEST_PATH
 
-def enrich(df):
-    # Remove travel agents
-    # Get all unique user ids
-    unique_users = df.user_id.unique()
-    # Remove all non-bookings to make counting easier
-    t1 = df[df.is_booking != 0]
-    for user in unique_users:
-        # Count the number of rows under a single user
-        bookings = len(t1.loc[t1['user_id'] == user])
-        if bookings >= 20:
-            # Remove the travel agent from dataset
-            df = df[df.user_id != user]
+
+def add_features(df):
+    # df = remove_travel_agents(df)
+    df = add_datetime_features(df)
+    return df
+
+def normalize(df):
     return df
 
 def calculate_score(df):
@@ -41,15 +37,18 @@ def train_val_split(X, y, groups, val_size=.7):
     print((X_train.shape, y_train.shape), (X_val.shape, y_val.shape))
     return X_train, y_train, X_val, y_val
 
-# Load the data
+
 def load_train_val():
-    df = pd.read_csv(TRAINING_PATH)
+    df = pd.read_csv(TRAINING_PATH, parse_dates=['date_time'])
     df['score'] = calculate_score(df)
 
-    groups = df['srch_id']
-    X = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1)
-    y = df['score']
+    # Add engineered features
+    df = add_features(df)
+    # Normalize features
+    df = normalize(df)
 
+    X, y = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1), df['score']
+    groups = df['srch_id']
     return train_val_split(X, y, groups)
 
 def load_test():
@@ -58,4 +57,5 @@ def load_test():
     return X
 
 if __name__ == "__main__":
-    load_train_val()
+    x1,y1, x2, y2 = load_train_val()
+    print(x1)

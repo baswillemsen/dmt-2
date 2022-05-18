@@ -18,6 +18,7 @@ def run():
 
     # Evaluate predictions
     predictions = model.predict(X_train)
+    print(predictions)
     score = ndcg_score(predictions, y_train)
     print("NCDG@5 Train Score:", score)
 
