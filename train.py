@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from preprocess import load_train_val, load_test
+from preprocess import train_val_split, load_test
 
 from sklearn.metrics import ndcg_score
 from xgboost import XGBRanker
@@ -11,10 +11,10 @@ def make_submission(model):
 
 def run():
     # Load the data
-    X_train, y_train, X_val, y_val = load_train_val()
+    X_train, y_train, X_val, y_val = train_val_split()
     # Train LambdaMART model
-    model = XGBRanker(eval_metric='ndcg@5')
-    model.fit(X_train, y_train, qid=X_train['srch_id'])
+    model = XGBRanker(rank='ndcg')
+    model.fit(X_train)
 
     # Evaluate predictions
     predictions = model.predict(X_train)
