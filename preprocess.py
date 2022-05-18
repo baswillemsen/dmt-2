@@ -52,8 +52,9 @@ def load_train_val():
     return train_val_split(X, y, groups)
 
 def load_test():
-    df = pd.read_csv(TEST_PATH)
-    X = df.drop(['srch_id', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1)
+    df = pd.read_csv(TEST_PATH, parse_dates=['date_time'])
+    df = add_features(df)
+    X = df.drop(['date_time'], axis=1)
     return X
 
 if __name__ == "__main__":
