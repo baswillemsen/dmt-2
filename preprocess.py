@@ -2,45 +2,56 @@
 import numpy as np
 import pandas as pd
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GroupShuffleSplit
 from config import TRAINING_PATH, TEST_PATH
 
 def enrich(df):
+    # Remove travel agents
+    # Get all unique user ids
+    unique_users = df.user_id.unique()
+    # Remove all non-bookings to make counting easier
+    t1 = df[df.is_booking != 0]
+    for user in unique_users:
+        # Count the number of rows under a single user
+        bookings = len(t1.loc[t1['user_id'] == user])
+        if bookings >= 20:
+            # Remove the travel agent from dataset
+            df = df[df.user_id != user]
     return df
 
 def calculate_score(df):
     """
     calculates final score used to predict location
     """
-    score = df['booking_bool'] * 5 + df['click']
+    df['booking_bool'] *= 5
+    score = df[['booking_bool', 'click_bool']].max(axis=1)
     return score
 
-def train_val_split(X, y, val_size):
+def train_val_split(X, y, groups, val_size=.7):
     """
-    could be more thoughtful, maybe split after grouping srch ids?
+    Splits training data based on groups
     """
-    return train_test_split(X, y, test_size=val_size)
+    gss = GroupShuffleSplit(n_splits=1, train_size=val_size, random_state=42)
+    train_indices, val_indices = next(gss.split(X, y, groups))
+
+    X_train, y_train = X.loc[train_indices], y[train_indices]
+    X_val, y_val = X.loc[val_indices], y[val_indices]
+
+    print("Training / Validation shape:")
+    print((X_train.shape, y_train.shape), (X_val.shape, y_val.shape))
+    print(y_val)
+    return X_train, y_train, X_val, y_val
 
 # Load the data
 def load_train_val():
-    train = pd.read_csv(TRAINING_PATH)
+    df = pd.read_csv(TRAINING_PATH)
+    df['score'] = calculate_score(df)
 
-    # Remove travel agents
-    # Get all unique user ids
-    unique_users = train.user_id.unique()
-    # Remove all non-bookings to make counting easier
-    t1 = train[train.is_booking != 0]
-    for user in unique_users:
-        # Count the number of rows under a single user
-        bookings = len(t1.loc[t1['user_id'] == user])
-        if bookings >= 20:
-            # Remove the travel agent from dataset
-            train = train[train.user_id != user]
+    groups = df['srch_id']
+    X = df.drop(['srch_id', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1)
+    y = df['score']
 
-    train['score'] = calculate_score(train)
+    return train_val_split(X, y, groups)
 
-    X = train.drop(['srch_id', 'position', 'score', 'click_bool', 'booking_bool', 'gross_booking_usd'])
-    y = train['score']
-
-    X_train, 
-    return X_train, y_train, X_val, y_val
+if __name__ == "__main__":
+    load_train_val()
