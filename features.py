@@ -1,7 +1,7 @@
 def add_datetime_features(df):
     df['month'] = df['date_time'].dt.month
-    df['week'] = df['date_time'].dt.isocalendar().week
-    df['year'] = df['date_time'].dt.year
+    df['dayofweek'] = df['date_time'].dt.dayofweek
+    df['hour'] = df['date_time'].dt.hour
     return df
 
 def remove_travel_agents(df):

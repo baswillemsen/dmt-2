@@ -8,7 +8,13 @@ from xgboost import XGBRanker
 
 def make_submission(model):
     X_test = load_test()
-
+    with open('submission.csv', 'w') as fout:
+        fout.write("srch_id,prop_id")
+        for srch_id, group in X_test.groupby(['srch_id']):
+            predictions = model.predict(group)
+            for prop_id in predictions:
+                fout.write(f"{srch_id},{prop_id}")
+    print("Made submission")
 def run():
     # Load the data
     X_train, y_train, X_val, y_val = load_train_val()
