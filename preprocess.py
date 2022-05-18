@@ -1,6 +1,19 @@
 # Install relevant packages
-import numpy as np
 import pandas as pd
+<<<<<<< HEAD
+import gc
+
+# Load the data
+# data_file_path = "C:\Users\Bas\OneDrive\MSc. Artificial Intelligence VU\MSc. AI Year 1\Data Mining Techniques\Assignment 2\dmt-2\data_subset"
+train = pd.read_csv("data_subset/train_subset.csv", sep=',')
+test = pd.read_csv("data_subset/test_subset.csv", sep=',')
+
+def preprocess(data, kind):
+    gc.collect()
+
+if __name__ == "__main__":
+    preprocess(data,kind)
+=======
 
 from sklearn.model_selection import GroupShuffleSplit
 from config import TRAINING_PATH, TEST_PATH
@@ -53,5 +66,10 @@ def load_train_val():
 
     return train_val_split(X, y, groups)
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     load_train_val()
+=======
+    X_train, 
+    return X_train, y_train, X_val, y_val
+>>>>>>> 274882aba7534812b202c474bc452d36d2646085
