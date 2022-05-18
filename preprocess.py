@@ -47,7 +47,7 @@ def load_train_val():
     # Normalize features
     df = normalize(df)
 
-    X, y = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1), df['srch_id', 'score']
+    X, y = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1), df[['srch_id', 'score']]
     groups = df['srch_id']
     return train_val_split(X, y, groups)
 
