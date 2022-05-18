@@ -17,7 +17,8 @@ def make_submission(model):
     print("Made submission")
 
 def make_ranking(X_test, model):
-    predictions = model.predict(X_test)
+    predictions = predict(model, X_test)
+    # predictions = model.predict(X_test)
     sorted_indices = np.argsort(predictions)
     prop_ids = X_test['prop_id'].iloc[sorted_indices]
     return prop_ids
