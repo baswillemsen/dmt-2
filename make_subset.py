@@ -5,7 +5,7 @@ This files makes subsets from the original train and test data file for computat
 import pandas as pd
 
 def make_subset():
-    # make training subset
+    # make training subset of first 10.000 out of 200.000 search_ids
     print("Reading training data ...")
     train = train = pd.read_csv( "data/training_set_VU_DM.csv")
     print("Making train_subset...")
@@ -13,7 +13,7 @@ def make_subset():
     train_subset.to_csv("data_subset/train_subset.csv", index=False, header=True)
     del train, train_subset
 
-    # make test subset
+    # make test subset of first 10.000 out of 200.000 search_ids
     print("Reading test data ...")
     test = pd.read_csv("data/test_set_VU_DM.csv")
     print("Making test_subset...")
