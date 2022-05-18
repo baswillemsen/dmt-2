@@ -59,5 +59,12 @@ def run():
     mean_score = np.mean(np.array(ndcg_score_list))
     print("NDCG@5 Validation Score:", mean_score)
 
+    return model
+
 if __name__ == "__main__":
-    run()
+    make_pred = True
+
+    model = run()
+    if make_pred:
+        make_submission(model)
+    
