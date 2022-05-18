@@ -21,7 +21,7 @@ def enrich(df):
 
 def calculate_score(df):
     """
-    calculates final score used to predict location
+    calculates final score used to predict rank
     """
     df['booking_bool'] *= 5
     score = df[['booking_bool', 'click_bool']].max(axis=1)
@@ -47,10 +47,15 @@ def load_train_val():
     df['score'] = calculate_score(df)
 
     groups = df['srch_id']
-    X = df.drop(['srch_id', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1)
+    X = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1)
     y = df['score']
 
     return train_val_split(X, y, groups)
+
+def load_test():
+    df = pd.read_csv(TEST_PATH)
+    X = df.drop(['srch_id', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1)
+    return X
 
 if __name__ == "__main__":
     load_train_val()
