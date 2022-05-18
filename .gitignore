@@ -10,7 +10,8 @@ __pycache__/
 *.so
 
 # large file folder
-data/
+data/*
+!data/.gitkeep
 
 # bas folder
 .idea
