@@ -57,4 +57,3 @@ def load_train_val():
 
     X_train, 
     return X_train, y_train, X_val, y_val
->>>>>>> bdbf9767d72c58ff728c77bd5c0c51e96edddfc4
