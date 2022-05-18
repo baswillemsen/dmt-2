@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from config import TRAINING_PATH, TEST_PATH
 
-def transform(df):
+def enrich(df):
     return df
 
 def calculate_score(df):

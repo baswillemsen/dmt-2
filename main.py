@@ -13,7 +13,7 @@ def run():
     # Load the data
     X_train, y_train, X_val, y_val = train_val_split()
     # Train LambdaMART model
-    model = XGBRanker(rank='ndcg')
+    model = XGBRanker(rank='ndcg', eval_metric='ndcg@5')
     model.fit(X_train)
 
     # Evaluate predictions
