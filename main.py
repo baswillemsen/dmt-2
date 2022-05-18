@@ -9,21 +9,42 @@ from xgboost import XGBRanker
 def make_submission(model):
     X_test = load_test()
 
+def predict(model, df):
+    return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
+
+def get_gt_values(df):
+    return df['score']
+
 def run():
     # Load the data
     X_train, y_train, X_val, y_val = load_train_val()
+    groups = X_train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
+    x_train_values = X_train.drop(['srch_id'], axis=1)
     # Train LambdaMART model
     model = XGBRanker(eval_metric='ndcg@5')
-    model.fit(X_train, y_train, qid=X_train['srch_id'])
+    y_train_scores = y_train['score']
+    model.fit(x_train_values, y_train_scores, group=groups, verbose=True)
 
     # Evaluate predictions
-    predictions = model.predict(X_train)
-    score = ndcg_score(predictions, y_train)
-    print("NCDG@5 Train Score:", score)
+    gt_values = y_train.groupby('srch_id')['score'].apply(np.array).values
+    predictions = (X_train.groupby('srch_id').apply(lambda x: predict(model, x))).values
+    # prop_id_predictions = X_train.groupby('srch_id')['prop_id'].apply(np.array).values
 
-    predictions = model.predict(X_val)
-    score = ndcg_score(predictions, y_val)
-    print("NCDG@5 Validation Score:", score)
+    ndcg_score_list = []
+    for i in range(len(predictions)):
+        score = ndcg_score(gt_values[i].reshape(1,-1), predictions[i].reshape(1,-1), k=5)
+        ndcg_score_list.append(score)
+    mean_score = np.mean(np.array(ndcg_score_list))
+    print("NDCG@5 Train Score:", mean_score)
+
+    gt_values = y_val.groupby('srch_id')['score'].apply(np.array).values
+    predictions = (X_val.groupby('srch_id').apply(lambda x: predict(model, x))).values
+    ndcg_score_list = []
+    for i in range(len(predictions)):
+        score = ndcg_score(gt_values[i].reshape(1,-1), predictions[i].reshape(1,-1), k=5)
+        ndcg_score_list.append(score)
+    mean_score = np.mean(np.array(ndcg_score_list))
+    print("NDCG@5 Validation Score:", mean_score)
 
 if __name__ == "__main__":
     run()
