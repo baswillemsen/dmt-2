@@ -23,7 +23,7 @@ def calculate_score(df):
     """
     calculates final score used to predict rank
     """
-    df['booking_bool'] *= 5
+    df['booking_bool'] *= 5.0
     score = df[['booking_bool', 'click_bool']].max(axis=1)
     return score
 
