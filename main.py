@@ -12,7 +12,6 @@ def make_submission(model):
         fout.write("srch_id,prop_id\n")
         for srch_id, group in X_test.groupby(['srch_id']):
             prop_ids = make_ranking(group, model)
-            print(prop_ids)
             for prop_id in prop_ids:
                 fout.write(f"{srch_id},{prop_id}\n")
     print("Made submission")
@@ -30,17 +29,17 @@ def run():
     model = XGBRanker(eval_metric='ndcg@5')
     model.fit(X_train, y_train, qid=X_train['srch_id'])
 
-    print(X_train.columns)
-    make_submission(model)
     # # Evaluate predictions
-    # predictions = model.predict(X_train)
-    # print(predictions)
-    # score = ndcg_score(predictions, y_train)
-    # print("NCDG@5 Train Score:", score)
+    ndcg_scores = []
+    for srch_id, group in X_val.groupby(['srch_id']):
+        scores = model.predict(group)
+        indices = X_val[X_val['srch_id'] == srch_id].index.tolist()
 
-    # predictions = model.predict(X_val)
-    # score = ndcg_score(predictions, y_val)
-    # print("NCDG@5 Validation Score:", score)
+        score = ndcg_score([scores], [y_val[indices].values], k=5)
+        ndcg_scores.append(score)
+    print("NCDG@5 Validation Score:", np.array(ndcg_scores).mean())
+
+    # make_submission(model)
 
 if __name__ == "__main__":
     run()
