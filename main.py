@@ -2,27 +2,12 @@ import numpy as np
 import pandas as pd
 
 from preprocess import load_train_val, load_test
+from submission import make_submission, make_ranking
 
 from sklearn.metrics import ndcg_score
 from xgboost import XGBRanker
 
-def make_submission(model):
-    X_test = load_test()
-    with open('submission.csv', 'w') as fout:
-        fout.write("srch_id,prop_id\n")
-        for srch_id, group in X_test.groupby(['srch_id']):
-            prop_ids = make_ranking(group, model)
-            for prop_id in prop_ids:
-                fout.write(f"{srch_id},{prop_id}\n")
-    print("Made submission")
-
-def make_ranking(X_test, model):
-    predictions = predict(model, X_test)
-    sorted_indices = np.argsort(predictions)
-    prop_ids = X_test['prop_id'].iloc[sorted_indices]
-    return prop_ids
-
-def evaluate_model(X_data, y_data):
+def evaluate_model(X_data, y_data, model):
     # Evaluate predictions
     gt_values = y_data.groupby('srch_id')['score'].apply(np.array).values
     predictions = (X_data.groupby('srch_id').apply(lambda x: predict(model, x))).values
@@ -33,7 +18,7 @@ def evaluate_model(X_data, y_data):
         score = ndcg_score(gt_values[i].reshape(1, -1), predictions[i].reshape(1, -1), k=5)
         ndcg_score_list.append(score)
     mean_score = np.mean(np.array(ndcg_score_list))
-    print("NDCG@5 Train Score:", mean_score)
+    print(mean_score)
 
 def predict(model, df):
     return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
@@ -52,9 +37,11 @@ def run():
     model.fit(x_train_values, y_train_scores, group=groups, verbose=True)
 
     # Evaluate training predictions
-    evaluate_model(X_train, y_train)
+    print("NDCG@5 Score Train data: ")
+    evaluate_model(X_train, y_train, model)
     # Evaluate validation predictions
-    evaluate_model(X_val, y_val)
+    print("NDCG@5 Score Validation data: ")
+    evaluate_model(X_val, y_val, model)
 
     return model
 
@@ -63,5 +50,6 @@ if __name__ == "__main__":
 
     model = run()
     if make_pred:
-        make_submission(model)
+        X_test = load_test()
+        make_submission(X_test, model)
     
