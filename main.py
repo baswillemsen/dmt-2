@@ -22,6 +22,19 @@ def make_ranking(X_test, model):
     prop_ids = X_test['prop_id'].iloc[sorted_indices]
     return prop_ids
 
+def evaluate_model(X_data, y_data):
+    # Evaluate predictions
+    gt_values = y_data.groupby('srch_id')['score'].apply(np.array).values
+    predictions = (X_data.groupby('srch_id').apply(lambda x: predict(model, x))).values
+    # prop_id_predictions = X_train.groupby('srch_id')['prop_id'].apply(np.array).values
+
+    ndcg_score_list = []
+    for i in range(len(predictions)):
+        score = ndcg_score(gt_values[i].reshape(1, -1), predictions[i].reshape(1, -1), k=5)
+        ndcg_score_list.append(score)
+    mean_score = np.mean(np.array(ndcg_score_list))
+    print("NDCG@5 Train Score:", mean_score)
+
 def predict(model, df):
     return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
 
@@ -29,7 +42,7 @@ def get_gt_values(df):
     return df['score']
 
 def run():
-    # Load the data
+    # Load the training, validation data
     X_train, y_train, X_val, y_val = load_train_val()
     groups = X_train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
     x_train_values = X_train.drop(['srch_id'], axis=1)
@@ -38,26 +51,10 @@ def run():
     y_train_scores = y_train['score']
     model.fit(x_train_values, y_train_scores, group=groups, verbose=True)
 
-    # Evaluate predictions
-    gt_values = y_train.groupby('srch_id')['score'].apply(np.array).values
-    predictions = (X_train.groupby('srch_id').apply(lambda x: predict(model, x))).values
-    # prop_id_predictions = X_train.groupby('srch_id')['prop_id'].apply(np.array).values
-
-    ndcg_score_list = []
-    for i in range(len(predictions)):
-        score = ndcg_score(gt_values[i].reshape(1,-1), predictions[i].reshape(1,-1), k=5)
-        ndcg_score_list.append(score)
-    mean_score = np.mean(np.array(ndcg_score_list))
-    print("NDCG@5 Train Score:", mean_score)
-
-    gt_values = y_val.groupby('srch_id')['score'].apply(np.array).values
-    predictions = (X_val.groupby('srch_id').apply(lambda x: predict(model, x))).values
-    ndcg_score_list = []
-    for i in range(len(predictions)):
-        score = ndcg_score(gt_values[i].reshape(1,-1), predictions[i].reshape(1,-1), k=5)
-        ndcg_score_list.append(score)
-    mean_score = np.mean(np.array(ndcg_score_list))
-    print("NDCG@5 Validation Score:", mean_score)
+    # Evaluate training predictions
+    evaluate_model(X_train, y_train)
+    # Evaluate validation predictions
+    evaluate_model(X_val, y_val)
 
     return model
 

@@ -9,7 +9,7 @@ from config import TRAINING_PATH, TEST_PATH
 
 def add_features(df):
     # df = remove_travel_agents(df)
-    df = add_datetime_features(df)
+    # df = add_datetime_features(df)
     return df
 
 def normalize(df):
