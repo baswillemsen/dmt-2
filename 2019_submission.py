@@ -440,21 +440,21 @@ def run(train_csv, test_csv, output_dir):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Trains the model and outputs the prediction.")
-    parser.add_argument(
-        "train_csv",
-        help="Absolute path to train_csv e.g., /home/igor/Downloads/train.csv",
-    )
-    parser.add_argument(
-        "test_csv",
-        help="Absolute path to test_csv e.g., /home/igor/Downloads/train.csv",
-    )
-    parser.add_argument(
-        "output_dir",
-        help="Directory to which trained model and submission.csv will be saved e.g., /home/igor/Downloads/",
-    )
-    args = parser.parse_args()
-    train_csv = args.train_csv
-    test_csv = args.test_csv
-    output_dir = args.output_dir
+    # parser = argparse.ArgumentParser("Trains the model and outputs the prediction.")
+    # parser.add_argument(
+    #     "train_csv",
+    #     help="Absolute path to train_csv e.g., /home/igor/Downloads/train.csv",
+    # )
+    # parser.add_argument(
+    #     "test_csv",
+    #     help="Absolute path to test_csv e.g., /home/igor/Downloads/train.csv",
+    # )
+    # parser.add_argument(
+    #     "output_dir",
+    #     help="Directory to which trained model and submission.csv will be saved e.g., /home/igor/Downloads/",
+    # )
+    # args = parser.parse_args()
+    train_csv = "data/training_set_VU_DM.csv"
+    test_csv = "data/test_set_VU_DM.csv"
+    output_dir = "output/"
     run(train_csv, test_csv, output_dir)

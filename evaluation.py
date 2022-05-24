@@ -7,6 +7,7 @@ from xgboost import XGBRanker
 from preprocessing import load_train
 
 def train_model(X_train, y_train):
+    print("Training on columns: ", X_train.columns.values)
     groups = X_train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
     model = XGBRanker(eval_metric='ndcg@5')
     model.fit(X_train.drop('srch_id', axis=1), y_train['score'], group=groups, verbose=True)
@@ -15,7 +16,7 @@ def train_model(X_train, y_train):
 def evaluate_model(X_data, y_data, model):
     # Evaluate predictions
     gt_values = y_data.groupby('srch_id')['score'].apply(np.array).values
-    predictions = (X_data.groupby('srch_id').apply(lambda x: model.predict(x.drop('srch_id', axis=1)))).values
+    predictions = (X_data.groupby('srch_id').apply(lambda x: predict(model, x))).values
 
     ndcg_score_list = []
     for gt_value, prediction in zip(gt_values, predictions):
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_path', type=str,
                         help='Specifies location of the training data file')
-                        
+
     args = parser.parse_args()
     model = run(args.train_path)
     

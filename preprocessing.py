@@ -8,11 +8,13 @@ def load_train(train_path, val_split=False):
     df = pd.read_csv(train_path, parse_dates=['date_time'])
     df['score'] = calculate_score(df)
 
+    df = drop_irrelevant_features(df)
     # Add engineered features
     df = add_features(df)
     # Normalize features
     df = normalize(df)
 
+    # remove columns missing in test data
     X, y = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1), df[['srch_id', 'score']]
     
     if val_split:
@@ -41,6 +43,10 @@ def train_val_split(X, y, groups, val_size=.7):
 def add_features(df):
     df = add_datetime_features(df)
     return df
+
+def drop_irrelevant_features(df):
+    feats = ['comp1_rate', 'comp1_inv', 'comp1_rate_percent_diff', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp4_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv', 'comp7_rate_percent_diff']
+    return df.drop(feats, axis=1)
 
 def normalize(df):
     return df
