@@ -4,7 +4,7 @@ from evaluation import predict
 
 def make_ranking(X_test, model):
     predictions = predict(model, X_test)
-    sorted_indices = np.argsort(predictions)
+    sorted_indices = np.argsort(predictions)[::-1]
     prop_ids = X_test['prop_id'].iloc[sorted_indices]
     return prop_ids
 

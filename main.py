@@ -8,10 +8,12 @@ from submit import make_submission
 
 
 def run(train_path):
+    print("Loading data...")
     X_train, y_train = load_train(train_path)
     X_test = load_test()
-    
+    print("Training model...")
     model = train_model(X_train, y_train)
+    print("Making Submission...")
     make_submission(X_test, model)
     
 if __name__ == "__main__":

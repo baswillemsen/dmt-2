@@ -25,6 +25,7 @@ def load_train(train_path, val_split=False):
 def load_test():
     df = pd.read_csv("data/test_set_VU_DM.csv", parse_dates=['date_time'])
     df = add_features(df)
+    df = drop_irrelevant_features(df)
     X = df.drop(['date_time'], axis=1)
     return X
 
