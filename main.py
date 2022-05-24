@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
-
-from preprocess import load_train_val, load_test
-from submission import make_submission, make_ranking
-
 from sklearn.metrics import ndcg_score
 from xgboost import XGBRanker
+
+from preprocess import load_train_val, load_test
+from submission import make_submission
 
 def evaluate_model(X_data, y_data, model):
     # Evaluate predictions
