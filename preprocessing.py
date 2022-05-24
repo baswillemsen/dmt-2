@@ -3,9 +3,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import GroupShuffleSplit
 
-from features import *
 
-def load_train_val(train_path, val_size):
+def load_train(train_path, val_split=False):
     df = pd.read_csv(train_path, parse_dates=['date_time'])
     df['score'] = calculate_score(df)
 
@@ -15,8 +14,11 @@ def load_train_val(train_path, val_size):
     df = normalize(df)
 
     X, y = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1), df[['srch_id', 'score']]
-    groups = df['srch_id']
-    return train_val_split(X, y, groups, val_size=val_size)
+    
+    if val_split:
+        groups = df['srch_id']
+        return train_val_split(X, y, groups)
+    return X,y
 
 def load_test():
     df = pd.read_csv("data/test_set_VU_DM.csv", parse_dates=['date_time'])
@@ -51,7 +53,8 @@ def calculate_score(df):
     score = df[['booking_bool', 'click_bool']].max(axis=1)
     return score
 
-
-if __name__ == "__main__":
-    x1,y1, x2, y2 = load_train_val()
-    print(x1)
+def add_datetime_features(df):
+    df['month'] = df['date_time'].dt.month
+    df['dayofweek'] = df['date_time'].dt.dayofweek
+    df['hour'] = df['date_time'].dt.hour
+    return df

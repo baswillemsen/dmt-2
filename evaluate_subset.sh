@@ -1,2 +1,2 @@
-python main.py \
-    --train_path "data/train_subset.csv" \
+python evaluation.py \
+    --train_path "data/train_subset.csv" 

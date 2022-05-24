@@ -1,7 +1,6 @@
 import numpy as np
 
-def predict(model, df):
-    return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
+from evaluation import predict
 
 def make_ranking(X_test, model):
     predictions = predict(model, X_test)
@@ -10,7 +9,7 @@ def make_ranking(X_test, model):
     return prop_ids
 
 def make_submission(X_test, model):
-    with open('submission.csv', 'w') as fout:
+    with open('data/submission.csv', 'w') as fout:
         fout.write("srch_id,prop_id\n")
         for srch_id, group in X_test.groupby(['srch_id']):
             prop_ids = make_ranking(group, model)
