@@ -10,7 +10,7 @@ def make_subset():
     train = train = pd.read_csv( "data/training_set_VU_DM.csv")
     print("Making train_subset...")
     train_subset = train[train['srch_id'] < train['srch_id'].unique()[10000]]
-    train_subset.to_csv("data_subset/train_subset.csv", index=False, header=True)
+    train_subset.to_csv("data/train_subset.csv", index=False, header=True)
     del train, train_subset
 
     print("Finished!")

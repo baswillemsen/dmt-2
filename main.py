@@ -25,9 +25,9 @@ def predict(model, df):
 def get_gt_values(df):
     return df['score']
 
-def run(train_path):
+def run(train_path, val_size):
     # Load the training, validation data
-    X_train, y_train, X_val, y_val = load_train_val(train_path)
+    X_train, y_train, X_val, y_val = load_train_val(train_path, val_size)
     groups = X_train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
 
     # Train LambdaMART model
@@ -45,12 +45,13 @@ def run(train_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('train_path', type=str,
+    parser.add_argument('--train_path', type=str,
                         help='Specifies location of the training data file')
+    parser.add_argument('--val_size', type=float, default=0.33,
+                        help='Specifies size of the validation set')
 
     args = parser.parse_args()
-    print(args)
-    model = run(args.train_path)
+    model = run(args.train_path, args.val_size)
 
     make_pred = False
     if make_pred:

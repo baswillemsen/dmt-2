@@ -1,1 +1,0 @@
-python main.py "data/train_subset.csv"
