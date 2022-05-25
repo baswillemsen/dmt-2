@@ -10,16 +10,8 @@ def make_subset():
     train = train = pd.read_csv( "data/training_set_VU_DM.csv")
     print("Making train_subset...")
     train_subset = train[train['srch_id'] < train['srch_id'].unique()[10000]]
-    train_subset.to_csv("data_subset/train_subset.csv", index=False, header=True)
+    train_subset.to_csv("data/train_subset.csv", index=False, header=True)
     del train, train_subset
-
-    # make test subset of first 10.000 out of 200.000 search_ids
-    print("Reading test data ...")
-    test = pd.read_csv("data/test_set_VU_DM.csv")
-    print("Making test_subset...")
-    test_subset = test[test['srch_id'] < test['srch_id'].unique()[10000]]
-    test_subset.to_csv("data_subset/test_subset.csv", index=False, header=True)
-    del test, test_subset
 
     print("Finished!")
 
