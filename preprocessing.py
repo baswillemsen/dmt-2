@@ -11,7 +11,8 @@ def preprocess(df):
     df = add_datetime_features(df)
     df = add_price_order(df)
     # Normalize features
-    df = normalize(df)
+    for target in ['prop_starrating', 'prop_review_score', 'prop_location_score1', 'prop_location_score2', 'price_usd']:
+        df[target + '_normalized'] = normalize(df, 'srch_id', target)
     return df
 
 def load_train(train_path, val_split=False):
@@ -62,8 +63,14 @@ def remove_outliers(df):
     df = df[df['srch_room_count'] <= 4]
     return df
 
-def normalize(df):
-    return df
+def normalize(df, group, target):
+    groups = df.groupby(group)[target]
+    # computes group-wise mean/std,
+    # then auto broadcasts to size of group chunk
+    mean = groups.transform("mean")
+    std = groups.transform("std")
+    target_normalized = (df[target] - mean) / std
+    return target_normalized
 
 def calculate_score(df):
     """
