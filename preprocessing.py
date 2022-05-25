@@ -50,7 +50,7 @@ def drop_irrelevant_features(df):
     feats = df.columns[df.isna().sum()/len(train) * 100 > 90].to_list() # drop cols with more than 90% of data missing
     print("Dopping columns: ", feats)
     # feats = ['comp1_rate', 'comp1_inv', 'comp1_rate_percent_diff', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp4_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv', 'comp7_rate_percent_diff']
-    return df.drop(feats, axis=1)
+    return df.drop(feats, axis=1, inplace=True)
 
 def normalize(df):
     return df
