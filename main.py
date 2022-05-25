@@ -25,8 +25,28 @@ def make_ranking(X_test, model):
 def predict(model, df):
     return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
 
-def get_gt_values(df):
-    return df['score']
+def run_train_val():
+    # Load the data
+    X_train, y_train, X_val, y_val = load_train_val()
+    X_train_val = pd.concat((X_train, X_val))
+    y_train_val = pd.concat((y_train, y_val))
+    groups = X_train_val.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
+    x_train_val_values = X_train_val.drop(['srch_id'], axis=1)
+    # Train LambdaMART model
+    model = XGBRanker(eval_metric='ndcg@5')
+    y_train_scores = y_train_val['score']
+    model.fit(x_train_val_values, y_train_scores, group=groups, verbose=True)
+
+    #evaluate model
+    gt_values = y_train_val.groupby('srch_id')['score'].apply(np.array).values
+    predictions = (X_train_val.groupby('srch_id').apply(lambda x: predict(model, x))).values
+    ndcg_score_list = []
+    for i in range(len(predictions)):
+        score = ndcg_score(gt_values[i].reshape(1,-1), predictions[i].reshape(1,-1), k=5)
+        ndcg_score_list.append(score)
+    mean_score = np.mean(np.array(ndcg_score_list))
+    print("NDCG@5 Train/Val Score:", mean_score)
+    return model
 
 def run():
     # Load the data
@@ -63,8 +83,13 @@ def run():
 
 if __name__ == "__main__":
     make_pred = True
+    # train_set = 'train'
+    train_set = 'train_val'
 
-    model = run()
+    if train_set == 'train':
+        model = run()
+    else:
+        model = run_train_val()
     if make_pred:
         make_submission(model)
     

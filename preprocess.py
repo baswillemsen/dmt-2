@@ -39,7 +39,7 @@ def train_val_split(X, y, groups, val_size=.7):
 
 
 def load_train_val():
-    df = pd.read_csv('data/train_subset.csv', parse_dates=['date_time'])
+    df = pd.read_csv(TRAINING_PATH, parse_dates=['date_time'])
     df['score'] = calculate_score(df)
 
     # Add engineered features
