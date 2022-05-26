@@ -15,5 +15,5 @@ def make_submission(X_test, model):
             prop_ids = make_ranking(group, model)
             for prop_id in prop_ids:
                 fout.write(f"{srch_id},{prop_id}\n")
-    print("Made submission")
+    print("Submission made!")
 

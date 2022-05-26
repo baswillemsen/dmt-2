@@ -23,14 +23,14 @@ def load_train(train_path, val_split=False):
 
     # remove columns missing in test data
     X, y = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1), df[['srch_id', 'score']]
-    
+
     if val_split:
         groups = df['srch_id']
         return train_val_split(X, y, groups)
-    return X,y
+    return X, y
 
-def load_test():
-    df = pd.read_csv("data/test_set_VU_DM.csv", parse_dates=['date_time'])
+def load_test(test_path):
+    df = pd.read_csv(test_path, parse_dates=['date_time'])
     df = preprocess(df)
     X = df.drop(['date_time'], axis=1)
     return X
@@ -49,7 +49,13 @@ def train_val_split(X, y, groups, val_size=.7):
 
 
 def drop_irrelevant_features(df):
-    feats = df.columns[df.isna().sum()/len(df) * 100 > 90].to_list() # drop cols with more than 90% of data missing
+    df_temp = df
+    for col in ['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd']:
+        if col in df_temp.columns:
+            df_temp = df_temp.drop(col, axis=1)
+        else:
+            continue
+    feats = df_temp.columns[df_temp.isna().sum()/len(df_temp) * 100 > 90].to_list() # drop cols with more than 90% of data missing
     print("Dopping columns: ", feats)
     # feats = ['comp1_rate', 'comp1_inv', 'comp1_rate_percent_diff', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp4_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv', 'comp7_rate_percent_diff']
     return df.drop(feats, axis=1)
