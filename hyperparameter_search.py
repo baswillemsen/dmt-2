@@ -1,7 +1,7 @@
-import torch
+
 import numpy as np
 import pandas as pd
-from hyperopt import hp, fmin,tpe, Trials
+from hyperopt import hp, fmin,tpe, Trials, space_eval
 from functools import partial
 from evaluation import run
 import argparse
@@ -10,7 +10,7 @@ def evaluate_model(param_space, train_path, model_name):
     #evaluates the model with the given hyperparameters. Return 1-ndgc@k as fmin from the hyperopt library minimizes that score that is returned.
     param_space['colsample_bytree'] = param_space['colsample_by']
     param_space['colsample_bylevel'] = param_space['colsample_by']
-    param_space['colsample_bynode '] = param_space['colsample_by']
+    param_space['colsample_bynode'] = param_space['colsample_by']
     del param_space['colsample_by']
     _, validation_score = run(train_path, model_name, param_space)
     return 1.0-validation_score
@@ -33,7 +33,8 @@ def hypertune(model_name, train_path, param_dict):
                 max_evals=15,
                 rstate=rstate,
                 trials=trials)
-    print('Best parameters:', hopt)
+    params = space_eval(param_space, hopt)
+    print('Best parameters:', params)
     print('All tried out parameters:')
     for i, x in enumerate(trials.trials):
         print('trial', i)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', default='pairwise', type=str,
                         help='What model to use for the hyperparameter tuning',
                         choices=['pairwise', 'listwise_ndcg', 'listwise_map'])
-    parser.add_argument('--train_path', default=r'data\train_subset.csv', type=str,
+    parser.add_argument('--train_path', default=r'data/train_subset.csv', type=str,
                         help='Specifies location of the training data file')
 
     args = parser.parse_args()
