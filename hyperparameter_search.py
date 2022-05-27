@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from hyperopt import hp, fmin,tpe, Trials
+from hyperopt import hp, fmin,tpe, Trials, space_eval
 from functools import partial
 from evaluation import run
 import argparse
@@ -36,7 +36,8 @@ def hypertune(model_name, train_path, param_dict, gpu=None):
                 max_evals=15,
                 rstate=rstate,
                 trials=trials)
-    print('Best parameters:', hopt)
+    params = space_eval(param_space, hopt)
+    print('Best parameters:', params)
     print('All tried out parameters:')
     for i, x in enumerate(trials.trials):
         print('trial', i)

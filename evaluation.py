@@ -34,7 +34,6 @@ def evaluate_model(X_data, y_data, model):
         score = ndcg_score([gt_value], [prediction], k=5)
         ndcg_score_list.append(score)
     mean_score = np.mean(np.array(ndcg_score_list))
-    print("NDCG@5 Score Validation data:", mean_score)
     return mean_score
 
 def run(train_path, model_name, param_space={}):
@@ -63,7 +62,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     #TODO set the param_space to the best hyperparameters resulting from hyperparameter search
-    param_space = {}
+    param_space = {'alpha': 2, 'colsample_by': 3, 'eta': 4, 'gamma': 0, 'lambda': 0, 'max_delta_step': 4, 'max_depth': 0, 'min_child_weight': 1, 'subsample': 1}
     if args.gpu_node != -1:
         param_space['gpu_id'] = args.gpu_node
         param_space['tree_method'] = 'gpu_hist'
