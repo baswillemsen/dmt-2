@@ -182,7 +182,7 @@ def preprocess_training_data(orig_data, kind="train", use_ndcg_choices=False):
     data_for_training = normalize_features(
         data_for_training,
         group_key="srch_id",
-        target_column="price_usd",
+
         take_log10=True,
     )
     data_for_training = normalize_features(

@@ -21,6 +21,9 @@ def train_model(X_train, y_train, model_name='pairwise', param_space={}):
     model.fit(X_train.drop('srch_id', axis=1), y_train['score'], group=groups, verbose=True)
     return model
 
+def predict(model, df):
+    return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
+
 def evaluate_model(X_data, y_data, model):
     # Evaluate predictions
     gt_values = y_data.groupby('srch_id')['score'].apply(np.array).values
@@ -31,10 +34,8 @@ def evaluate_model(X_data, y_data, model):
         score = ndcg_score([gt_value], [prediction], k=5)
         ndcg_score_list.append(score)
     mean_score = np.mean(np.array(ndcg_score_list))
+    print("NDCG@5 Score Validation data:", mean_score)
     return mean_score
-
-def predict(model, df):
-    return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
 
 def run(train_path, model_name, param_space={}):
     # Load the training, validation data
@@ -52,10 +53,14 @@ def run(train_path, model_name, param_space={}):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_path', type=str,
-                        help='Specifies location of the training data file')
-    #TODO add the best hyperparameters resulting from the hyperparameter search
+    parser.add_argument('--model_name', default='pairwise', type=str,
+                        help='What model to use for the hyperparameter tuning',
+                        choices=['pairwise', 'listwise_ndcg', 'listwise_map'])
+    parser.add_argument('--train_path', type=str, default='data/training_set_VU_DM.csv',
+                    help='Specifies location of the training data file')
 
     args = parser.parse_args()
-    model = run(args.train_path)
+    #TODO set the param_space to the best hyperparameters resulting from hyperparameter search
+    param_space = {}
+    model = run(args.train_path, args.model_name, param_space)
     
