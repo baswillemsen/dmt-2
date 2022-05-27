@@ -17,7 +17,6 @@ def train_model(X_train, y_train, model_name='pairwise', param_space={}):
         param_space['objective']='rank:map'
     param_space['eval_metric']='ndcg@5'
     model = XGBRanker(**param_space)
-
     model.fit(X_train.drop('srch_id', axis=1), y_train['score'], group=groups, verbose=True)
     return model
 
