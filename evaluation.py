@@ -16,6 +16,7 @@ def train_model(X_train, y_train, model_name='pairwise', param_space={}):
     elif model_name == 'listwise_map':
         param_space['objective']='rank:map'
     param_space['eval_metric']='ndcg@5'
+    param_space = {'alpha': 2, 'colsample_by': 3, 'eta': 4, 'gamma': 0, 'lambda': 0, 'max_delta_step': 4, 'max_depth': 0, 'min_child_weight': 1, 'subsample': 1}
     model = XGBRanker(**param_space)
 
     model.fit(X_train.drop('srch_id', axis=1), y_train['score'], group=groups, verbose=True)
@@ -34,7 +35,6 @@ def evaluate_model(X_data, y_data, model):
         score = ndcg_score([gt_value], [prediction], k=5)
         ndcg_score_list.append(score)
     mean_score = np.mean(np.array(ndcg_score_list))
-    print("NDCG@5 Score Validation data:", mean_score)
     return mean_score
 
 def run(train_path, model_name, param_space={}):
