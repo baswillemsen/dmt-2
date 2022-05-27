@@ -29,8 +29,23 @@ if __name__ == "__main__":
                     help='Specifies location of the training data file')
     parser.add_argument('--test_path', type=str, default='data/test_set_VU_DM.csv',
                     help='Specifies location of the testing data file')
+    parser.add_argument('--gpu_node', default=-1, type=int,
+                        help='Specifies GPU node')
 
     args = parser.parse_args()
     #TODO set the param_space to the best hyperparameters resulting from hyperparameter search
-    param_space = {}
+    param_space = {'eta': 0.2,
+                    'gamma' : 0.0,
+                    'max_depth' : 5,
+                    'min_child_weight' : 1.0,
+                    'max_delta_step' : 5,
+                    'subsample' : 1.0,
+                    'colsample_bytree' : 0.7,
+                    'colsample_bylevel' : 0.7,
+                    'colsample_bynode' : 0.7,
+                    'lambda' : 1.0,
+                    'alpha' : 0.6}
+    if args.gpu_node != -1:
+        param_space['gpu_id'] = args.gpu_node
+        param_space['tree_method'] = 'gpu_hist'
     model = run(args.train_path, args.test_path, args.model_name, param_space)

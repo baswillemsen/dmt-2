@@ -58,9 +58,14 @@ if __name__ == "__main__":
                         choices=['pairwise', 'listwise_ndcg', 'listwise_map'])
     parser.add_argument('--train_path', type=str, default='data/training_set_VU_DM.csv',
                     help='Specifies location of the training data file')
+    parser.add_argument('--gpu_node', default=-1, type=int,
+                        help='Specifies GPU node')
 
     args = parser.parse_args()
     #TODO set the param_space to the best hyperparameters resulting from hyperparameter search
     param_space = {}
+    if args.gpu_node != -1:
+        param_space['gpu_id'] = args.gpu_node
+        param_space['tree_method'] = 'gpu_hist'
     model = run(args.train_path, args.model_name, param_space)
     

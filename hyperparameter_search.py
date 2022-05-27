@@ -1,4 +1,3 @@
-import torch
 import numpy as np
 import pandas as pd
 from hyperopt import hp, fmin,tpe, Trials
@@ -6,16 +5,19 @@ from functools import partial
 from evaluation import run
 import argparse
 
-def evaluate_model(param_space, train_path, model_name):
+def evaluate_model(param_space, train_path, model_name, gpu):
     #evaluates the model with the given hyperparameters. Return 1-ndgc@k as fmin from the hyperopt library minimizes that score that is returned.
     param_space['colsample_bytree'] = param_space['colsample_by']
     param_space['colsample_bylevel'] = param_space['colsample_by']
-    param_space['colsample_bynode '] = param_space['colsample_by']
+    param_space['colsample_bynode'] = param_space['colsample_by']
     del param_space['colsample_by']
+    if gpu is not None:
+        param_space['gpu_id'] = gpu
+        param_space['tree_method'] = 'gpu_hist'
     _, validation_score = run(train_path, model_name, param_space)
     return 1.0-validation_score
 
-def hypertune(model_name, train_path, param_dict):
+def hypertune(model_name, train_path, param_dict, gpu=None):
     seed = 42
     rstate = np.random.default_rng(seed)
     param_space = {}
@@ -25,7 +27,8 @@ def hypertune(model_name, train_path, param_dict):
     optimization_function = partial(
                                 evaluate_model,
                                 train_path = train_path,
-                                model_name = model_name)
+                                model_name = model_name,
+                                gpu = gpu)
     trials = Trials()
     hopt = fmin(fn=optimization_function,
                 space=param_space,
@@ -54,8 +57,12 @@ if __name__ == '__main__':
                         choices=['pairwise', 'listwise_ndcg', 'listwise_map'])
     parser.add_argument('--train_path', default='data/training_set_VU_DM.csv', type=str,
                         help='Specifies location of the training data file')
+    parser.add_argument('--gpu_node', default=-1, type=int,
+                        help='Specifies GPU node')
 
     args = parser.parse_args()
+    if args.gpu_node == -1:
+        args.gpu_node = None
 
     param_dict = {'eta': [0.01, 0.05, 0.1, 0.15, 0.2],
                     'gamma' : [0.0, 0.05, 0.1, 0.5, 1.0, 2.0],
@@ -66,4 +73,4 @@ if __name__ == '__main__':
                     'colsample_by' : [0.5, 0.7, 0.9, 1.0],
                     'lambda' : [0.2, 0.4, 0.6, 0.8, 1.0],
                     'alpha' : [0.2, 0.4, 0.6, 0.8, 1.0]}
-    hypertune(args.model_name, args.train_path, param_dict)
+    hypertune(args.model_name, args.train_path, param_dict, args.gpu_node)

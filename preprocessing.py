@@ -11,8 +11,8 @@ def preprocess(df):
     df = add_datetime_features(df)
     df = add_price_order(df)
     # Normalize features
-    for target in ['prop_starrating', 'prop_review_score', 'prop_location_score1', 'prop_location_score2', 'price_usd']:
-        df[target + '_normalized'] = normalize(df, 'srch_id', target)
+    # for target in ['prop_starrating', 'prop_review_score', 'prop_location_score1', 'prop_location_score2', 'price_usd']:
+    #     df[target + '_normalized'] = normalize(df, 'srch_id', target)
     return df
 
 def load_train(train_path, val_split=False):
