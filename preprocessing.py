@@ -6,7 +6,7 @@ from sklearn.model_selection import GroupShuffleSplit
 def preprocess(df):
     # something
     df = drop_irrelevant_features(df)
-    df = remove_outliers(df)
+    # df = remove_outliers(df)
     # Add engineered features
     df = add_datetime_features(df)
     df = add_price_order(df)
@@ -29,8 +29,8 @@ def load_train(train_path, val_split=False):
         return train_val_split(X, y, groups)
     return X, y
 
-def load_test(test_path):
-    df = pd.read_csv(test_path, parse_dates=['date_time'])
+def load_test():
+    df = pd.read_csv("data/test_set_VU_DM.csv", parse_dates=['date_time'])
     df = preprocess(df)
     X = df.drop(['date_time'], axis=1)
     return X
@@ -47,7 +47,6 @@ def train_val_split(X, y, groups, val_size=.7):
 
     return X_train, y_train, X_val, y_val
 
-
 def drop_irrelevant_features(df):
     df_temp = df
     for col in ['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd']:
@@ -60,14 +59,14 @@ def drop_irrelevant_features(df):
     # feats = ['comp1_rate', 'comp1_inv', 'comp1_rate_percent_diff', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp4_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv', 'comp7_rate_percent_diff']
     return df.drop(feats, axis=1)
 
-def remove_outliers(df):
-    df = df[df['price_usd'] <= 600]
-    df = df[df['srch_length_of_stay'] <= 10]
-    df = df[df['srch_booking_window'] <= 250]
-    df = df[df['srch_adults_count'] <= 6]
-    df = df[df['srch_children_count'] <= 4]
-    df = df[df['srch_room_count'] <= 4]
-    return df
+# def remove_outliers(df):
+#     df = df[df['price_usd'] <= 600]
+#     df = df[df['srch_length_of_stay'] <= 10]
+#     df = df[df['srch_booking_window'] <= 250]
+#     df = df[df['srch_adults_count'] <= 6]
+#     df = df[df['srch_children_count'] <= 4]
+#     df = df[df['srch_room_count'] <= 4]
+#     return df
 
 def normalize(df, group, target):
     groups = df.groupby(group)[target]
