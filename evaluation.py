@@ -61,7 +61,28 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     #TODO set the param_space to the best hyperparameters resulting from hyperparameter search
-    param_space = {'alpha': 2, 'colsample_by': 3, 'eta': 4, 'gamma': 0, 'lambda': 0, 'max_delta_step': 4, 'max_depth': 0, 'min_child_weight': 1, 'subsample': 1}
+    # param_space = {'eta': 0.2,    #listwise_NDCG model
+    #                 'gamma' : 0.0,
+    #                 'max_depth' : 5,
+    #                 'min_child_weight' : 1.0,
+    #                 'max_delta_step' : 5,
+    #                 'subsample' : 1.0,
+    #                 'colsample_bytree' : 0.7,
+    #                 'colsample_bylevel' : 0.7,
+    #                 'colsample_bynode' : 0.7,
+    #                 'lambda' : 1.0,
+    #                 'alpha' : 0.6}
+    param_space = {'eta': 0.2,  #listwise_MAP model
+                    'gamma' : 0.0,
+                    'max_depth' : 3,
+                    'min_child_weight' : 0.05,
+                    'max_delta_step' : 7,
+                    'subsample' : 0.9,
+                    'colsample_bytree' : 1.0,
+                    'colsample_bylevel' : 1.0,
+                    'colsample_bynode' : 1.0,
+                    'lambda' : 0.2,
+                    'alpha' : 0.6}
     if args.gpu_node != -1:
         param_space['gpu_id'] = args.gpu_node
         param_space['tree_method'] = 'gpu_hist'
