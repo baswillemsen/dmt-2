@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import argparse
+
 from sklearn.metrics import ndcg_score
 from xgboost import XGBRanker
 
@@ -23,15 +24,16 @@ def evaluate_model(X_data, y_data, model):
         score = ndcg_score([gt_value], [prediction], k=5)
         ndcg_score_list.append(score)
     mean_score = np.mean(np.array(ndcg_score_list))
-    print("NDCG@5 Score Validation data:", mean_score)
     return mean_score
 
 def predict(model, df):
     return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
 
 def run(train_path):
-    # Load the training, validation data
+    print("Loading data...")
     X_train, y_train, X_val, y_val = load_train(train_path, val_split=True)
+
+    print("Training model...")
     model = train_model(X_train, y_train)
 
     # Evaluate training predictions
@@ -41,11 +43,10 @@ def run(train_path):
     score = evaluate_model(X_val, y_val, model)
     print("NDCG@5 Score Validation data:", score)
 
-    return model
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_path', type=str,
+    parser.add_argument('--train_path', type=str, default='data/training_set_VU_DM.csv',
                         help='Specifies location of the training data file')
 
     args = parser.parse_args()

@@ -5,13 +5,16 @@ from sklearn.model_selection import GroupShuffleSplit
 
 def preprocess(df):
     # something
+    print("Dropping irrelevant features...")
     df = drop_irrelevant_features(df)
-    # df = remove_outliers(df)
     # Add engineered features
+    print("Adding datetime features...")
     df = add_datetime_features(df)
+    print("Adding price order features...")
     df = add_price_order(df)
     # Normalize features
-    for target in ['prop_starrating', 'prop_review_score', 'prop_location_score1', 'prop_location_score2', 'price_usd']:
+    print("Normalizing data...")
+    for target in ['prop_starrating', 'prop_review_score', 'prop_location_score1', 'prop_location_score2','price_usd']:
         df[target + '_normalized'] = normalize(df, 'srch_id', target)
     return df
 
@@ -22,9 +25,11 @@ def load_train(train_path, val_split=False):
     df = preprocess(df)
 
     # remove columns missing in test data
+    print("Dropping columns missing in test data... ")
     X, y = df.drop(['date_time', 'position', 'score', 'click_bool', 'booking_bool', 'gross_bookings_usd'], axis=1), df[['srch_id', 'score']]
 
     if val_split:
+        print("Splitting data...")
         groups = df['srch_id']
         return train_val_split(X, y, groups)
     return X, y
