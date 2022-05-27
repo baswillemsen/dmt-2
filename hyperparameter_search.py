@@ -52,7 +52,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', default='pairwise', type=str,
                         help='What model to use for the hyperparameter tuning',
                         choices=['pairwise', 'listwise_ndcg', 'listwise_map'])
-    parser.add_argument('--train_path', default=r'data\train_subset.csv', type=str,
+    parser.add_argument('--train_path', default='data/training_set_VU_DM.csv', type=str,
                         help='Specifies location of the training data file')
 
     args = parser.parse_args()
