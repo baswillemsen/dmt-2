@@ -6,10 +6,18 @@ from xgboost import XGBRanker
 
 from preprocessing import load_train
 
-def train_model(X_train, y_train):
+def train_model(X_train, y_train, model_name='pairwise', param_space={}):
     print("Training on columns: ", X_train.columns.values)
     groups = X_train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
-    model = XGBRanker(eval_metric='ndcg@5')
+    if model_name == 'pairwise':
+        param_space['objective']='rank:pairwise'
+    elif model_name == 'listwise_ndcg':
+        param_space['objective']='rank:ndcg'
+    elif model_name == 'listwise_map':
+        param_space['objective']='rank:map'
+    param_space['eval_metric']='ndcg@5'
+    model = XGBRanker(**param_space)
+
     model.fit(X_train.drop('srch_id', axis=1), y_train['score'], group=groups, verbose=True)
     return model
 
@@ -28,10 +36,10 @@ def evaluate_model(X_data, y_data, model):
 def predict(model, df):
     return model.predict(df.loc[:, ~df.columns.isin(['srch_id'])])
 
-def run(train_path):
+def run(train_path, model_name, param_space={}):
     # Load the training, validation data
     X_train, y_train, X_val, y_val = load_train(train_path, val_split=True)
-    model = train_model(X_train, y_train)
+    model = train_model(X_train, y_train, model_name, param_space)
 
     # Evaluate training predictions
     score = evaluate_model(X_train, y_train, model)
@@ -40,12 +48,13 @@ def run(train_path):
     score = evaluate_model(X_val, y_val, model)
     print("NDCG@5 Score Validation data:", score)
 
-    return model
+    return model, score
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_path', type=str,
                         help='Specifies location of the training data file')
+    #TODO add the best hyperparameters resulting from the hyperparameter search
 
     args = parser.parse_args()
     model = run(args.train_path)

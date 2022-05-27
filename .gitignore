@@ -139,3 +139,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 submission.csv
+model.py
+datasets.py
