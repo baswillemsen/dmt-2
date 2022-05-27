@@ -6,7 +6,7 @@ from sklearn.model_selection import GroupShuffleSplit
 def preprocess(df):
     # something
     df = drop_irrelevant_features(df)
-    df = remove_outliers(df)
+    # df = remove_outliers(df)
     # Add engineered features
     df = add_datetime_features(df)
     df = add_price_order(df)
@@ -61,13 +61,7 @@ def drop_irrelevant_features(df):
     return df.drop(feats, axis=1)
 
 def remove_outliers(df):
-    df = df[df['price_usd'] <= 600]
-    df = df[df['srch_length_of_stay'] <= 10]
-    df = df[df['srch_booking_window'] <= 250]
-    df = df[df['srch_adults_count'] <= 6]
-    df = df[df['srch_children_count'] <= 4]
-    df = df[df['srch_room_count'] <= 4]
-    return df
+    pass
 
 def normalize(df, group, target):
     groups = df.groupby(group)[target]
